@@ -1,6 +1,7 @@
 import streamlit as st
 from app.components.cabecalho import cabecalho
 from app.components.status_badge import html_badge
+from app.components.estilos import html_card_equipamento
 from app.services.equipamentos import listar_plantas, listar_areas, listar_por_area
 from app.services.telemetria import status_atual, ultima_leitura, get_limites
 
@@ -57,25 +58,14 @@ for i in range(0, len(equipamentos), cols_por_linha):
     for col, eq in zip(cols, equipamentos[i : i + cols_por_linha]):
         st_eq = status_atual(eq["TAG"], limites)
         ult = ultima_leitura(eq["TAG"])
-        cor_borda = {"ok": "#2E7D32", "warn": "#FFB300", "crit": "#EF5350"}[st_eq]
 
         with col:
             st.markdown(
-                f"""
-                <div style="border:1px solid {cor_borda}; border-radius:10px;
-                            padding:14px 16px; background:#1A1A1A; margin-bottom:8px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <strong style="color:#FFB300; font-size:1.05rem;">{eq['TAG']}</strong>
-                        {html_badge(st_eq)}
-                    </div>
-                    <div style="color:#CCC; font-size:0.85rem; margin-top:6px;">
-                        {eq['Modelo']} · {eq['Fabricante']}
-                    </div>
-                    <div style="color:#888; font-size:0.78rem; margin-top:4px;">
-                        {eq['Potência (W)']} W · {eq['Tensão (V)']} V
-                    </div>
-                </div>
-                """,
+                html_card_equipamento(
+                    tag=eq["TAG"], modelo=eq["Modelo"], fabricante=eq["Fabricante"],
+                    potencia=eq["Potência (W)"], tensao=eq["Tensão (V)"],
+                    badge_html=html_badge(st_eq), status=st_eq,
+                ),
                 unsafe_allow_html=True,
             )
             if ult:

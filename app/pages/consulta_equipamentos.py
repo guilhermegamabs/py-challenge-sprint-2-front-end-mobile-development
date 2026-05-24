@@ -6,6 +6,7 @@ from app.services.equipamentos import (
 from app.services.telemetria import status_atual, get_limites
 from app.components.cabecalho import cabecalho
 from app.components.status_badge import CORES as STATUS_CORES
+from app.components.estilos import estilo_severidade_pandas
 
 
 @st.dialog("Confirmar remoção")
@@ -37,14 +38,12 @@ if not equipamentos:
     st.info("Nenhum equipamento cadastrado.")
     st.stop()
 
-# Enriquecer com status
 limites = get_limites()
 for eq in equipamentos:
     eq["Status"] = STATUS_CORES[status_atual(eq["TAG"], limites)]["label"]
 
 df_base = pd.DataFrame(equipamentos)
 
-# Filtros
 plantas = ["Todas"] + sorted({eq["Planta"] for eq in equipamentos if eq.get("Planta")})
 col1, col2, col3, col4 = st.columns([3, 2, 2, 2])
 
@@ -79,18 +78,8 @@ colunas_exibir = ["TAG", "Modelo", "Fabricante", "Planta", "Área", "Potência (
 df_view = df[colunas_exibir].reset_index(drop=True)
 
 
-def estilo_status(v):
-    if v == "Crítico":
-        return "color:#F44336; font-weight:700;"
-    if v == "Atenção":
-        return "color:#FFB300; font-weight:700;"
-    if v == "OK":
-        return "color:#4CAF50; font-weight:700;"
-    return ""
-
-
 evento = st.dataframe(
-    df_view.style.map(estilo_status, subset=["Status"]),
+    df_view.style.map(estilo_severidade_pandas, subset=["Status"]),
     use_container_width=True,
     hide_index=True,
     on_select="rerun",

@@ -1,4 +1,5 @@
 import streamlit as st
+from app.components.estilos import html_titulo_pagina, html_divider_laranja
 
 
 def cabecalho(titulo: str, pagina_voltar: str | None = None):
@@ -8,18 +9,11 @@ def cabecalho(titulo: str, pagina_voltar: str | None = None):
 
     col_titulo, col_acao = st.columns([5, 1])
     with col_titulo:
-        st.markdown(
-            f'<h1 style="color:#FFB300; font-family:Inter,sans-serif; font-weight:900; margin-top:4px;">'
-            f'{titulo}</h1>',
-            unsafe_allow_html=True,
-        )
+        st.markdown(html_titulo_pagina(titulo), unsafe_allow_html=True)
     if pagina_voltar:
         with col_acao:
             st.write("")
             if st.button("← Voltar", use_container_width=True):
                 st.switch_page(pagina_voltar)
 
-    st.markdown(
-        '<hr style="border:none; border-top:2px solid #FFB300; margin:6px 0 18px 0;">',
-        unsafe_allow_html=True,
-    )
+    st.markdown(html_divider_laranja(), unsafe_allow_html=True)

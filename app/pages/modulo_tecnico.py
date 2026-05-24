@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 from app.components.cabecalho import cabecalho
+from app.components.estilos import html_placeholder_vazio
 from app.services.equipamentos import (
     get_equipamento, atualizar_equipamento, listar_plantas, listar_areas,
 )
@@ -42,11 +43,7 @@ if not st.session_state["editando"]:
         if img_path and os.path.exists(img_path):
             st.image(img_path, use_container_width=True)
         else:
-            st.markdown(
-                '<div style="border:1px dashed #444; border-radius:6px; padding:18px;'
-                ' text-align:center; color:#666; font-size:0.85rem;">Sem imagem cadastrada</div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown(html_placeholder_vazio("Sem imagem cadastrada", padding_px=18), unsafe_allow_html=True)
 
     st.divider()
     if st.button("Editar", type="primary"):

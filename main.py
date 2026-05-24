@@ -1,5 +1,6 @@
 import streamlit as st
 from app.services.db import init_db
+from app.components.estilos import aplicar_estilo_global
 
 st.set_page_config(
     page_title="Forzy — Monitoramento de Ativos",
@@ -8,83 +9,7 @@ st.set_page_config(
 )
 
 init_db()
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-
-html, body, [class*="css"], .stMarkdown, .stText, label, p, div {
-    font-family: 'Inter', sans-serif !important;
-}
-
-[data-testid="stSidebar"] {
-    background-color: #1A1A1A !important;
-}
-
-
-[data-testid="stSidebarNav"] a {
-    border-left: 3px solid transparent;
-    padding-left: 10px !important;
-    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 600 !important;
-    border-radius: 0 6px 6px 0;
-}
-
-[data-testid="stSidebarNav"] a[aria-current="page"] {
-    border-left: 3px solid #FFB300 !important;
-    color: #FFB300 !important;
-    background-color: #2A2A2A !important;
-}
-
-.stButton > button {
-    border-radius: 8px !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 600 !important;
-    transition: opacity 0.2s;
-}
-
-.stButton > button:hover {
-    opacity: 0.85;
-}
-
-[data-testid="baseButton-secondary"] {
-    border: 1px solid #FFB300 !important;
-    color: #FFB300 !important;
-}
-
-[data-testid="stTextInput"] > div > div > input,
-[data-testid="stNumberInput"] > div > div > input {
-    border: 1px solid #FFB300 !important;
-    border-radius: 6px !important;
-    background-color: #1A1A1A !important;
-}
-
-[data-testid="stSelectbox"] > div > div,
-[data-testid="stMultiSelect"] > div > div {
-    border: 1px solid #FFB300 !important;
-    border-radius: 6px !important;
-    background-color: #1A1A1A !important;
-}
-
-[data-testid="stDataFrame"] th {
-    background-color: #2A2A2A !important;
-    color: #FFB300 !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 700 !important;
-    border-bottom: 2px solid #FFB300 !important;
-}
-
-[data-testid="stDataFrame"] tr:hover td {
-    background-color: rgba(255, 179, 0, 0.08) !important;
-}
-
-
-hr {
-    border-color: #333333 !important;
-}
-</style>
-""", unsafe_allow_html=True)
+aplicar_estilo_global()
 
 paginas = {
     "Operação": [

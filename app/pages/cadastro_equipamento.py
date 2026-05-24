@@ -4,6 +4,7 @@ from app.services.equipamentos import tag_existe, adicionar_equipamento, listar_
 from app.services.ocr_placa import extrair as ocr_extrair, CAMPOS as OCR_CAMPOS
 from app.services.db import PLACAS_DIR
 from app.components.cabecalho import cabecalho
+from app.components.estilos import html_linha_check, html_linha_alerta
 
 cabecalho("Novo Equipamento", pagina_voltar="app/pages/consulta_equipamentos.py")
 st.caption("Faça upload da placa do motor para extração automática via IA (Gemini), ou preencha manualmente.")
@@ -70,7 +71,7 @@ if st.session_state["ocr_extraidos"] or st.session_state["ocr_faltando"]:
         if st.session_state["ocr_extraidos"]:
             for c in OCR_CAMPOS:
                 if c in st.session_state["ocr_extraidos"]:
-                    st.markdown(f'<span style="color:#4CAF50;">✓</span> {c}', unsafe_allow_html=True)
+                    st.markdown(html_linha_check(c), unsafe_allow_html=True)
         else:
             st.caption("Nenhum")
     with col_falta:
@@ -78,7 +79,7 @@ if st.session_state["ocr_extraidos"] or st.session_state["ocr_faltando"]:
         if st.session_state["ocr_faltando"]:
             for c in OCR_CAMPOS:
                 if c in st.session_state["ocr_faltando"]:
-                    st.markdown(f'<span style="color:#FFB300;">⚠</span> {c}', unsafe_allow_html=True)
+                    st.markdown(html_linha_alerta(c), unsafe_allow_html=True)
         else:
             st.caption("Nenhum")
     if st.session_state["ocr_texto_bruto"]:

@@ -2,10 +2,15 @@ import os
 import streamlit as st
 import plotly.graph_objects as go
 from app.components.cabecalho import cabecalho
-from app.components.status_badge import html_badge, COR_PLOTLY
+from app.components.status_badge import html_badge
+from app.components.estilos import (
+    CORES, COR_PLOTLY,
+    html_header_ativo, html_placeholder_vazio, html_titulo_grandeza,
+    estilo_severidade_pandas,
+)
 from app.services.equipamentos import get_equipamento
 from app.services.telemetria import (
-    GRANDEZAS, get_limites, ultima_leitura, classificar,
+    GRANDEZAS, get_limites, ultima_leitura,
     status_por_grandeza, get_historico, alertas_recentes,
 )
 
@@ -25,19 +30,12 @@ cabecalho(f"Dashboard — {eq['TAG']}", pagina_voltar="app/pages/navegacao_plant
 
 col_info, col_img = st.columns([3, 1])
 with col_info:
-    breadcrumb = f"{eq.get('Planta') or '—'}  ›  {eq.get('Área') or '—'}"
     st.markdown(
-        f"""
-        <div style="background:#1A1A1A; border-left:4px solid #FFB300; padding:14px 18px; border-radius:6px;">
-            <div style="color:#888; font-size:0.78rem;">{breadcrumb}</div>
-            <div style="color:#F5F5F5; font-size:1.1rem; margin-top:4px;">
-                <strong>{eq['Modelo']}</strong> &nbsp;·&nbsp; {eq['Fabricante']}
-            </div>
-            <div style="color:#AAA; font-size:0.85rem; margin-top:2px;">
-                {eq['Potência (W)']} W &nbsp;·&nbsp; {eq['Tensão (V)']} V
-            </div>
-        </div>
-        """,
+        html_header_ativo(
+            planta=eq.get("Planta"), area=eq.get("Área"),
+            modelo=eq["Modelo"], fabricante=eq["Fabricante"],
+            potencia=eq["Potência (W)"], tensao=eq["Tensão (V)"],
+        ),
         unsafe_allow_html=True,
     )
 
@@ -46,12 +44,7 @@ with col_img:
     if img_path and os.path.exists(img_path):
         st.image(img_path, caption="Placa do motor", use_container_width=True)
     else:
-        st.markdown(
-            '<div style="border:1px dashed #444; border-radius:6px; padding:24px; '
-            'text-align:center; color:#666; font-size:0.8rem;">'
-            "Sem imagem da placa cadastrada</div>",
-            unsafe_allow_html=True,
-        )
+        st.markdown(html_placeholder_vazio("Sem imagem da placa cadastrada"), unsafe_allow_html=True)
 
 st.divider()
 
@@ -82,13 +75,13 @@ else:
             go.Indicator(
                 mode="gauge+number",
                 value=float(valor or 0),
-                number={"suffix": f" {lim['unidade']}", "font": {"size": 22, "color": "#F5F5F5"}},
+                number={"suffix": f" {lim['unidade']}", "font": {"size": 22, "color": CORES["text_light"]}},
                 gauge={
                     "axis": {"range": [0, lim["fundo_escala"]], "tickcolor": "#777", "tickfont": {"color": "#999"}},
                     "bar":  {"color": cor, "thickness": 0.3},
-                    "bgcolor": "#1A1A1A",
+                    "bgcolor": CORES["bg_card"],
                     "borderwidth": 1,
-                    "bordercolor": "#333",
+                    "bordercolor": CORES["border_dark"],
                     "steps": [
                         {"range": [0, max(0, lim["crit_min"])], "color": "rgba(244,67,54,0.22)"},
                         {"range": [max(0, lim["crit_min"]), max(0, lim["warn_min"])], "color": "rgba(255,179,0,0.20)"},
@@ -97,7 +90,7 @@ else:
                         {"range": [lim["crit_max"], lim["fundo_escala"]], "color": "rgba(244,67,54,0.22)"},
                     ],
                     "threshold": {
-                        "line": {"color": "#F5F5F5", "width": 2},
+                        "line": {"color": CORES["text_light"], "width": 2},
                         "thickness": 0.75,
                         "value": float(valor or 0),
                     },
@@ -107,14 +100,10 @@ else:
         fig.update_layout(
             height=220,
             margin=dict(l=10, r=10, t=10, b=10),
-            paper_bgcolor="#111111",
-            font={"color": "#F5F5F5", "family": "Inter"},
+            paper_bgcolor=CORES["bg_dark"],
+            font={"color": CORES["text_light"], "family": "Inter"},
         )
-        col.markdown(
-            f"<div style='display:flex; justify-content:space-between; align-items:center;'>"
-            f"<strong style='color:#F5F5F5;'>{rotulos[g]}</strong>{html_badge(st_g)}</div>",
-            unsafe_allow_html=True,
-        )
+        col.markdown(html_titulo_grandeza(rotulos[g], html_badge(st_g)), unsafe_allow_html=True)
         col.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 st.divider()
@@ -144,23 +133,23 @@ else:
     fig.add_trace(go.Scatter(
         x=df_hist["ts"], y=df_hist[g_sel],
         mode="lines",
-        line=dict(color="#FFB300", width=2),
+        line=dict(color=CORES["primary"], width=2),
         name=label_sel,
         hovertemplate="%{x|%d/%m %H:%M}<br>%{y:.2f} " + lim["unidade"] + "<extra></extra>",
     ))
     fig.add_hrect(y0=lim["warn_min"], y1=lim["warn_max"], fillcolor="rgba(76,175,80,0.07)", line_width=0)
-    fig.add_hline(y=lim["warn_max"], line=dict(color="#FFB300", width=1, dash="dash"))
-    fig.add_hline(y=lim["crit_max"], line=dict(color="#F44336", width=1, dash="dash"))
+    fig.add_hline(y=lim["warn_max"], line=dict(color=CORES["warn"], width=1, dash="dash"))
+    fig.add_hline(y=lim["crit_max"], line=dict(color=CORES["crit"], width=1, dash="dash"))
     if lim["warn_min"] > 0:
-        fig.add_hline(y=lim["warn_min"], line=dict(color="#FFB300", width=1, dash="dash"))
+        fig.add_hline(y=lim["warn_min"], line=dict(color=CORES["warn"], width=1, dash="dash"))
     if lim["crit_min"] > 0:
-        fig.add_hline(y=lim["crit_min"], line=dict(color="#F44336", width=1, dash="dash"))
+        fig.add_hline(y=lim["crit_min"], line=dict(color=CORES["crit"], width=1, dash="dash"))
 
     fig.update_layout(
         height=380,
         margin=dict(l=10, r=10, t=30, b=10),
-        paper_bgcolor="#111111", plot_bgcolor="#1A1A1A",
-        font={"color": "#F5F5F5", "family": "Inter"},
+        paper_bgcolor=CORES["bg_dark"], plot_bgcolor=CORES["bg_card"],
+        font={"color": CORES["text_light"], "family": "Inter"},
         xaxis=dict(gridcolor="#2A2A2A", title=""),
         yaxis=dict(gridcolor="#2A2A2A", title=lim["unidade"]),
         hovermode="x unified",
@@ -182,14 +171,8 @@ df_alertas = alertas_recentes(tag, janela, limites)
 if df_alertas.empty:
     st.success("Nenhum alerta detectado no período selecionado.")
 else:
-    def estilo_sev(v):
-        if v == "Crítico":
-            return "color:#F44336; font-weight:700;"
-        if v == "Atenção":
-            return "color:#FFB300; font-weight:700;"
-        return ""
     st.dataframe(
-        df_alertas.style.map(estilo_sev, subset=["Severidade"]),
+        df_alertas.style.map(estilo_severidade_pandas, subset=["Severidade"]),
         use_container_width=True,
         hide_index=True,
         column_config={
