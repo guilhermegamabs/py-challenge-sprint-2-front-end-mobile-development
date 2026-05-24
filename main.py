@@ -1,10 +1,13 @@
 import streamlit as st
+from app.services.db import init_db
 
 st.set_page_config(
-    page_title="Gestão de Equipamentos",
+    page_title="Forzy — Monitoramento de Ativos",
     page_icon="img/forzy_logo.jpg",
     layout="wide",
 )
+
+init_db()
 
 st.markdown("""
 <style>
@@ -83,16 +86,22 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-paginas = [
-    st.Page("app/pages/consulta_equipamentos.py", title="Consulta de Equipamentos", default=True),
-    st.Page("app/pages/cadastro_equipamento.py",  title="Novo Equipamento"),
-    st.Page("app/pages/modulo_tecnico.py",        title="Módulo Técnico"),
-    st.Page("app/pages/dados_brutos.py",          title="Dados Brutos"),
-]
+paginas = {
+    "Operação": [
+        st.Page("app/pages/navegacao_planta.py",     title="Navegação por Planta", default=True),
+        st.Page("app/pages/dashboard_ativo.py",      title="Dashboard do Ativo"),
+    ],
+    "Cadastro": [
+        st.Page("app/pages/consulta_equipamentos.py", title="Consulta de Equipamentos"),
+        st.Page("app/pages/cadastro_equipamento.py",  title="Novo Equipamento"),
+        st.Page("app/pages/modulo_tecnico.py",        title="Módulo Técnico"),
+        st.Page("app/pages/dados_brutos.py",          title="Dados Brutos"),
+    ],
+}
 
 with st.sidebar:
     st.markdown(
-        '<p style="text-align:center; color:#888; font-size:0.8rem; margin:0;">Sprint 1 — Fundamentos do Ativo</p>',
+        '<p style="text-align:center; color:#888; font-size:0.8rem; margin:0;">Sprint 2 — Visualização Operacional</p>',
         unsafe_allow_html=True,
     )
     st.divider()
